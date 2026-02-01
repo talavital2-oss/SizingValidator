@@ -1,0 +1,11 @@
+@import "tailwindcss";
+
+* {
+  border-color: #e2e8f0; /* slate-200 */
+}
+
+body {
+  background-color: #ffffff;
+  color: #0f172a; /* slate-900 */
+  font-feature-settings: "rlig" 1, "calt" 1;
+}
