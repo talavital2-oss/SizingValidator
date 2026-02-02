@@ -1,11 +1,43 @@
 @import "tailwindcss";
 
+/* TeraSky Dark Theme */
+:root {
+  --terasky-bg: #0a0f1a;
+  --terasky-card: #111827;
+  --terasky-card-hover: #1f2937;
+  --terasky-border: #1e3a5f;
+  --terasky-cyan: #06b6d4;
+  --terasky-blue: #3b82f6;
+  --terasky-text: #f1f5f9;
+  --terasky-text-muted: #94a3b8;
+}
+
 * {
-  border-color: #e2e8f0; /* slate-200 */
+  border-color: var(--terasky-border);
 }
 
 body {
-  background-color: #ffffff;
-  color: #0f172a; /* slate-900 */
+  background: linear-gradient(135deg, #0a0f1a 0%, #0f172a 50%, #0a1628 100%);
+  color: var(--terasky-text);
   font-feature-settings: "rlig" 1, "calt" 1;
+  min-height: 100vh;
+}
+
+/* Custom scrollbar for dark theme */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--terasky-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--terasky-border);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--terasky-cyan);
 }

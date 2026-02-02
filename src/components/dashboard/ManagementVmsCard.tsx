@@ -15,115 +15,96 @@ export function ManagementVmsCard({
   onUpdateInfraVm,
 }: ManagementVmsCardProps) {
   return (
-    <Card className="rounded-xl shadow-sm border border-slate-200">
+    <Card>
       <CardHeader className="pb-3">
-        <CardTitle className="text-base font-semibold text-slate-900 flex items-center gap-2">
-          <Layers className="h-4 w-4 text-slate-500" /> 
-          Management VMs
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-3">
-        <div className="text-xs text-slate-500">
-          Defaults reflect vendor reference architecture sizing (editable). 
-          Toggle components you deploy.
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-base flex items-center gap-2">
+            <Layers className="h-4 w-4 text-cyan-400" /> 
+            Management VMs
+          </CardTitle>
+          
+          {/* Totals inline with header */}
+          <div className="flex items-center gap-4 text-xs">
+            <div className="flex items-center gap-2">
+              <span className="text-slate-400">VMs:</span>
+              <span className="font-bold text-cyan-400">{formatInt(infraTotals.infraVmCount)}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-slate-400">vCPU:</span>
+              <span className="font-bold text-cyan-400">{formatInt(infraTotals.infraVcpu)}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-slate-400">RAM:</span>
+              <span className="font-bold text-cyan-400">{formatInt(infraTotals.infraRamGb)} GB</span>
+            </div>
+          </div>
         </div>
-
-        <div className="space-y-2">
+      </CardHeader>
+      <CardContent>
+        {/* Horizontal grid of VMs */}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
           {infraVms.map((vm) => (
             <div 
               key={vm.key} 
-              className="rounded-md border border-slate-200 bg-white p-3"
+              className={`
+                rounded-lg border p-3 transition-all
+                ${vm.enabled 
+                  ? "border-cyan-500/30 bg-cyan-500/5 hover:bg-cyan-500/10" 
+                  : "border-slate-700/30 bg-slate-900/30 opacity-50"
+                }
+              `}
             >
-              <div className="flex items-start justify-between gap-3">
-                <label className="flex items-start gap-2 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    className="mt-1 accent-blue-600"
-                    checked={vm.enabled}
-                    onChange={(e) => onUpdateInfraVm(vm.key, { 
-                      enabled: e.target.checked 
-                    })}
-                  />
-                  <div>
-                    <div className="text-sm font-semibold text-slate-900">
-                      {vm.label}
-                    </div>
-                    {vm.note && (
-                      <div className="text-xs text-slate-500 mt-0.5">
-                        {vm.note}
-                      </div>
-                    )}
-                  </div>
-                </label>
+              {/* Header with checkbox and short name */}
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  className="accent-cyan-500 rounded w-4 h-4"
+                  checked={vm.enabled}
+                  onChange={(e) => onUpdateInfraVm(vm.key, { enabled: e.target.checked })}
+                />
+                <span className={`text-xs font-semibold truncate ${vm.enabled ? "text-white" : "text-slate-500"}`}>
+                  {vm.label.split('(')[0].trim()}
+                </span>
+              </label>
 
-                <div className="grid grid-cols-3 gap-2 min-w-[210px]">
-                  <div>
-                    <div className="text-[10px] uppercase tracking-widest text-slate-400">
-                      Count
-                    </div>
-                    <input
-                      className="mt-1 w-full rounded-md border border-slate-200 bg-white px-2 py-1 text-sm disabled:opacity-50 disabled:bg-slate-50"
-                      type="number"
-                      value={vm.count}
-                      min={0}
-                      onChange={(e) => onUpdateInfraVm(vm.key, { 
-                        count: clamp(Number(e.target.value), 0, 20) 
-                      })}
-                      disabled={!vm.enabled}
-                    />
-                  </div>
-                  <div>
-                    <div className="text-[10px] uppercase tracking-widest text-slate-400">
-                      vCPU
-                    </div>
-                    <input
-                      className="mt-1 w-full rounded-md border border-slate-200 bg-white px-2 py-1 text-sm disabled:opacity-50 disabled:bg-slate-50"
-                      type="number"
-                      value={vm.vcpu}
-                      min={1}
-                      onChange={(e) => onUpdateInfraVm(vm.key, { 
-                        vcpu: clamp(Number(e.target.value), 1, 64) 
-                      })}
-                      disabled={!vm.enabled}
-                    />
-                  </div>
-                  <div>
-                    <div className="text-[10px] uppercase tracking-widest text-slate-400">
-                      RAM
-                    </div>
-                    <input
-                      className="mt-1 w-full rounded-md border border-slate-200 bg-white px-2 py-1 text-sm disabled:opacity-50 disabled:bg-slate-50"
-                      type="number"
-                      value={vm.ramGb}
-                      min={1}
-                      onChange={(e) => onUpdateInfraVm(vm.key, { 
-                        ramGb: clamp(Number(e.target.value), 1, 256) 
-                      })}
-                      disabled={!vm.enabled}
-                    />
-                  </div>
+              {/* Compact inputs row */}
+              <div className="mt-2 grid grid-cols-3 gap-1">
+                <div>
+                  <div className="text-[9px] text-slate-500 text-center">QTY</div>
+                  <input
+                    className="w-full rounded border border-slate-700 bg-slate-800/80 px-1 py-1 text-center text-xs text-white disabled:opacity-40 disabled:bg-slate-900"
+                    type="number"
+                    value={vm.count}
+                    min={0}
+                    onChange={(e) => onUpdateInfraVm(vm.key, { count: clamp(Number(e.target.value), 0, 20) })}
+                    disabled={!vm.enabled}
+                  />
+                </div>
+                <div>
+                  <div className="text-[9px] text-slate-500 text-center">vCPU</div>
+                  <input
+                    className="w-full rounded border border-slate-700 bg-slate-800/80 px-1 py-1 text-center text-xs text-white disabled:opacity-40 disabled:bg-slate-900"
+                    type="number"
+                    value={vm.vcpu}
+                    min={1}
+                    onChange={(e) => onUpdateInfraVm(vm.key, { vcpu: clamp(Number(e.target.value), 1, 64) })}
+                    disabled={!vm.enabled}
+                  />
+                </div>
+                <div>
+                  <div className="text-[9px] text-slate-500 text-center">RAM</div>
+                  <input
+                    className="w-full rounded border border-slate-700 bg-slate-800/80 px-1 py-1 text-center text-xs text-white disabled:opacity-40 disabled:bg-slate-900"
+                    type="number"
+                    value={vm.ramGb}
+                    min={1}
+                    onChange={(e) => onUpdateInfraVm(vm.key, { ramGb: clamp(Number(e.target.value), 1, 256) })}
+                    disabled={!vm.enabled}
+                  />
                 </div>
               </div>
             </div>
           ))}
-        </div>
-
-        <div className="rounded-md bg-slate-50 border border-slate-200 p-3">
-          <div className="text-xs text-slate-500">Infra totals (enabled)</div>
-          <div className="mt-2 grid grid-cols-2 gap-2 text-sm text-slate-700">
-            <div>Infra VM count</div>
-            <div className="text-right font-semibold">
-              {formatInt(infraTotals.infraVmCount)}
-            </div>
-            <div>Total infra vCPU</div>
-            <div className="text-right font-semibold">
-              {formatInt(infraTotals.infraVcpu)}
-            </div>
-            <div>Total infra RAM (GB)</div>
-            <div className="text-right font-semibold">
-              {formatInt(infraTotals.infraRamGb)}
-            </div>
-          </div>
         </div>
       </CardContent>
     </Card>

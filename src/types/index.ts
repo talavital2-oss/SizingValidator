@@ -87,6 +87,16 @@ export interface SystemOverhead {
 }
 
 /**
+ * DEM Storage configuration
+ */
+export interface DemStorage {
+  profilesEnabled: boolean
+  profileSizeGbPerUser: number
+  userDataEnabled: boolean
+  userDataSizeGbPerUser: number
+}
+
+/**
  * Calculated infrastructure totals
  */
 export interface InfraTotals {

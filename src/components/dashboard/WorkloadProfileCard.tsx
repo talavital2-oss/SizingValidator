@@ -25,78 +25,60 @@ export function WorkloadProfileCard({
   onUpdateCpuMode,
   onUpdateNPlusRedundancy,
 }: WorkloadProfileCardProps) {
-  const currentProfile = USER_PROFILES[workload.userProfile]
-
   return (
-    <Card className="rounded-xl shadow-sm border border-slate-200">
+    <Card>
       <CardHeader className="pb-3">
-        <CardTitle className="text-base font-semibold text-slate-900 flex items-center gap-2">
-          <Users className="h-4 w-4 text-slate-500" /> 
-          Workload Profile
+        <CardTitle className="text-base flex items-center gap-2">
+          <Users className="h-4 w-4 text-cyan-400" /> 
+          Workload
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-3">
         {/* User Profile Selection */}
         <div>
-          <div className="text-[11px] uppercase tracking-widest text-slate-500 mb-2">
-            User Profile (LoginVSI Benchmark)
+          <div className="text-[10px] uppercase tracking-widest text-slate-400 mb-1">
+            Profile
           </div>
           <select
-            className="w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900"
+            className="w-full rounded-md border border-slate-700 bg-slate-800/50 px-3 py-2 text-sm text-white focus:ring-2 focus:ring-cyan-500/50"
             value={workload.userProfile}
             onChange={(e) => onUpdateUserProfile(e.target.value as UserProfile)}
           >
             {Object.entries(USER_PROFILES).map(([key, profile]) => (
               <option key={key} value={key}>
-                {profile.name} - {profile.description}
+                {profile.name}
               </option>
             ))}
           </select>
-          <div className="mt-2 text-xs text-slate-500">
-            Recommended: {currentProfile.vcpus} vCPU, {currentProfile.memoryGb} GB RAM, 
-            {currentProfile.vcpuRatioRecommended}:1 ratio
-          </div>
         </div>
 
-        <Separator />
-
-        {/* VM Count and Concurrency */}
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-2">
           <InputBox
-            label="VM COUNT"
+            label="VMs"
             value={workload.vmCount}
             onChange={(v) => onUpdateWorkload({ 
               vmCount: clamp(v, WORKLOAD_LIMITS.vmCount.min, WORKLOAD_LIMITS.vmCount.max) 
             })}
           />
-          <div>
-            <div className="text-[11px] uppercase tracking-widest text-slate-500">
-              CONCURRENCY %
-            </div>
-            <input
-              className="mt-2 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-200"
-              type="number"
-              min={WORKLOAD_LIMITS.concurrencyPercent.min}
-              max={WORKLOAD_LIMITS.concurrencyPercent.max}
-              value={workload.concurrencyPercent}
-              onChange={(e) => onUpdateWorkload({ 
-                concurrencyPercent: clamp(Number(e.target.value), WORKLOAD_LIMITS.concurrencyPercent.min, WORKLOAD_LIMITS.concurrencyPercent.max) 
-              })}
-            />
-          </div>
+          <InputBox
+            label="Concurrency %"
+            value={workload.concurrencyPercent}
+            onChange={(v) => onUpdateWorkload({ 
+              concurrencyPercent: clamp(v, WORKLOAD_LIMITS.concurrencyPercent.min, WORKLOAD_LIMITS.concurrencyPercent.max) 
+            })}
+          />
         </div>
 
-        {/* VM Specs */}
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-2">
           <InputBox
-            label="VCPU / VM"
+            label="vCPU/VM"
             value={workload.vCpuPerVm}
             onChange={(v) => onUpdateWorkload({ 
               vCpuPerVm: clamp(v, WORKLOAD_LIMITS.vCpuPerVm.min, WORKLOAD_LIMITS.vCpuPerVm.max) 
             })}
           />
           <InputBox
-            label="RAM (GB) / VM"
+            label="RAM/VM (GB)"
             value={workload.ramGbPerVm}
             onChange={(v) => onUpdateWorkload({ 
               ramGbPerVm: clamp(v, WORKLOAD_LIMITS.ramGbPerVm.min, WORKLOAD_LIMITS.ramGbPerVm.max) 
@@ -106,80 +88,40 @@ export function WorkloadProfileCard({
 
         <Separator />
 
-        {/* CPU GHz Settings */}
-        <div className="rounded-lg bg-slate-50 border border-slate-200 p-3">
-          <div className="text-xs font-medium text-slate-700 mb-2">
-            CPU Demand (GHz per VM) - from LoginVSI
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <div className="text-[10px] uppercase tracking-widest text-slate-400">Average</div>
-              <input
-                className="mt-1 w-full rounded-md border border-slate-200 bg-white px-2 py-1 text-sm"
-                type="number"
-                step={WORKLOAD_LIMITS.avgCpuGhzPerVm.step}
-                min={WORKLOAD_LIMITS.avgCpuGhzPerVm.min}
-                max={WORKLOAD_LIMITS.avgCpuGhzPerVm.max}
-                value={workload.avgCpuGhzPerVm}
-                onChange={(e) => onUpdateWorkload({ 
-                  avgCpuGhzPerVm: clamp(Number(e.target.value), WORKLOAD_LIMITS.avgCpuGhzPerVm.min, WORKLOAD_LIMITS.avgCpuGhzPerVm.max) 
-                })}
-              />
-            </div>
-            <div>
-              <div className="text-[10px] uppercase tracking-widest text-slate-400">Peak</div>
-              <input
-                className="mt-1 w-full rounded-md border border-slate-200 bg-white px-2 py-1 text-sm"
-                type="number"
-                step={WORKLOAD_LIMITS.peakCpuGhzPerVm.step}
-                min={WORKLOAD_LIMITS.peakCpuGhzPerVm.min}
-                max={WORKLOAD_LIMITS.peakCpuGhzPerVm.max}
-                value={workload.peakCpuGhzPerVm}
-                onChange={(e) => onUpdateWorkload({ 
-                  peakCpuGhzPerVm: clamp(Number(e.target.value), WORKLOAD_LIMITS.peakCpuGhzPerVm.min, WORKLOAD_LIMITS.peakCpuGhzPerVm.max) 
-                })}
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* HA Settings */}
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-2">
           <div>
-            <div className="text-[11px] uppercase tracking-widest text-slate-500">
-              N+ REDUNDANCY
+            <div className="text-[10px] uppercase tracking-widest text-slate-400 mb-1">
+              N+ Redundancy
             </div>
             <select
-              className="mt-2 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900"
+              className="w-full rounded-md border border-slate-700 bg-slate-800/50 px-3 py-2 text-sm text-white focus:ring-2 focus:ring-cyan-500/50"
               value={hardware.nPlusRedundancy}
               onChange={(e) => onUpdateNPlusRedundancy(Number(e.target.value))}
             >
               {Array.from({ length: Math.min(hardware.hosts - 1, 4) }, (_, i) => i + 1).map((n) => (
-                <option key={n} value={n}>
-                  N+{n} (tolerate {n} host failure{n > 1 ? "s" : ""})
-                </option>
+                <option key={n} value={n}>N+{n}</option>
               ))}
             </select>
           </div>
           <div>
-            <div className="text-[11px] uppercase tracking-widest text-slate-500">
-              LOAD MODE
+            <div className="text-[10px] uppercase tracking-widest text-slate-400 mb-1">
+              Load Mode
             </div>
             <select
-              className="mt-2 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900"
+              className="w-full rounded-md border border-slate-700 bg-slate-800/50 px-3 py-2 text-sm text-white focus:ring-2 focus:ring-cyan-500/50"
               value={cpuModeSettings.cpuMode}
               onChange={(e) => onUpdateCpuMode(e.target.value as CpuMode)}
             >
-              <option value="average">Average (typical day)</option>
-              <option value="peak">Peak (stress test)</option>
+              <option value="average">Average</option>
+              <option value="peak">Peak</option>
             </select>
           </div>
         </div>
 
-        <div className="text-[11px] text-slate-500">
+        <div className="text-[10px] text-slate-500">
           {cpuModeSettings.cpuMode === "average" 
-            ? `Using ${formatNumber(workload.avgCpuGhzPerVm, 2)} GHz/VM - typical workday usage`
-            : `Using ${formatNumber(workload.peakCpuGhzPerVm, 2)} GHz/VM - boot storm / peak load`
+            ? `${formatNumber(workload.avgCpuGhzPerVm, 2)} GHz/VM typical`
+            : `${formatNumber(workload.peakCpuGhzPerVm, 2)} GHz/VM peak`
           }
         </div>
       </CardContent>

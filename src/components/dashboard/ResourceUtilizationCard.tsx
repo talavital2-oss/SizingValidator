@@ -5,7 +5,6 @@ import { Separator } from "@/components/ui/separator"
 import { Meter } from "./Meter"
 import type { ClusterComputed, InfraTotals, CpuModeSettings, VsanMode, HardwareConfig, CapacityView } from "@/types"
 import { formatNumber, formatInt, gbToTb } from "@/lib/utils"
-import { USER_PROFILES } from "@/constants"
 
 interface ResourceUtilizationCardProps {
   computed: ClusterComputed
@@ -15,18 +14,16 @@ interface ResourceUtilizationCardProps {
   vsanMode: VsanMode
   vsanCpuOverheadPct: number
   vmCount: number
-  userProfile: string
-  concurrencyPercent: number
   onRefresh?: () => void
   onUpdateCapacityView: (view: CapacityView) => void
 }
 
 function AssessmentBadge({ status }: { status: string }) {
   const colors = {
-    OPTIMAL: "bg-emerald-100 text-emerald-700 border-emerald-200",
-    ACCEPTABLE: "bg-blue-100 text-blue-700 border-blue-200",
-    WARNING: "bg-amber-100 text-amber-700 border-amber-200",
-    CRITICAL: "bg-red-100 text-red-700 border-red-200",
+    OPTIMAL: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30",
+    ACCEPTABLE: "bg-blue-500/20 text-blue-400 border-blue-500/30",
+    WARNING: "bg-amber-500/20 text-amber-400 border-amber-500/30",
+    CRITICAL: "bg-red-500/20 text-red-400 border-red-500/30",
   }
   return (
     <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium border ${colors[status as keyof typeof colors] || colors.ACCEPTABLE}`}>
@@ -43,75 +40,67 @@ export function ResourceUtilizationCard({
   vsanMode,
   vsanCpuOverheadPct,
   vmCount,
-  userProfile,
-  concurrencyPercent,
   onRefresh,
   onUpdateCapacityView,
 }: ResourceUtilizationCardProps) {
-  const profileSpec = USER_PROFILES[userProfile as keyof typeof USER_PROFILES]
   const infraCpuDemandGhz = computed.totalCpuDemandGhz - computed.vdiCpuDemandGhz
   const isFailoverView = cpuModeSettings.capacityView === "failover"
   
   return (
-    <Card className="rounded-xl shadow-sm md:col-span-2 border border-slate-200">
+    <Card>
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-base font-semibold text-slate-900">
-            Cluster Resource Utilization
+          <CardTitle className="text-lg">
+            Resource Utilization
           </CardTitle>
-          <Button variant="ghost" className="gap-2 text-slate-600" onClick={onRefresh}>
-            <RefreshCcw className="h-4 w-4" /> Refresh
+          <Button variant="ghost" size="sm" className="gap-2 text-slate-400 hover:text-white" onClick={onRefresh}>
+            <RefreshCcw className="h-4 w-4" />
           </Button>
         </div>
         
         {/* Capacity View Toggle */}
         <div className="mt-3 flex items-center gap-2">
-          <div className="text-xs text-slate-500">Capacity View:</div>
-          <div className="inline-flex rounded-md border border-slate-200 bg-white p-0.5">
+          <div className="text-xs text-slate-400">View:</div>
+          <div className="inline-flex rounded-md border border-slate-700 bg-slate-800/50 p-0.5">
             <button
               className={`px-3 py-1 text-xs font-medium rounded transition-colors ${
                 !isFailoverView 
-                  ? "bg-blue-600 text-white" 
-                  : "text-slate-600 hover:bg-slate-100"
+                  ? "bg-cyan-600 text-white" 
+                  : "text-slate-400 hover:text-white"
               }`}
               onClick={() => onUpdateCapacityView("normal")}
             >
-              Normal ({computed.totalHosts} hosts)
+              Normal ({computed.totalHosts})
             </button>
             <button
               className={`px-3 py-1 text-xs font-medium rounded transition-colors ${
                 isFailoverView 
-                  ? "bg-amber-500 text-white" 
-                  : "text-slate-600 hover:bg-slate-100"
+                  ? "bg-amber-600 text-white" 
+                  : "text-slate-400 hover:text-white"
               }`}
               onClick={() => onUpdateCapacityView("failover")}
             >
-              Failover N-{hardware.nPlusRedundancy} ({computed.hostsForCapacity} hosts)
+              Failover ({computed.hostsForCapacity})
             </button>
           </div>
         </div>
 
         {isFailoverView && (
-          <div className="mt-2 flex items-center gap-2 text-xs text-amber-600 bg-amber-50 border border-amber-200 rounded-md px-3 py-2">
+          <div className="mt-2 flex items-center gap-2 text-xs text-amber-400 bg-amber-500/10 border border-amber-500/30 rounded-md px-3 py-2">
             <AlertTriangle className="h-4 w-4" />
-            Showing capacity after {hardware.nPlusRedundancy} host failure{hardware.nPlusRedundancy > 1 ? "s" : ""} (N+{hardware.nPlusRedundancy} scenario)
+            Showing N+{hardware.nPlusRedundancy} failover scenario
           </div>
         )}
 
-        <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-slate-500">
-          <span className="inline-flex items-center gap-2 rounded-md border border-slate-200 bg-white px-2 py-1">
-            Load: <span className="font-semibold text-slate-700">
-              {cpuModeSettings.cpuMode === "peak" ? "Peak" : "Average"}
+        <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-slate-400">
+          <span className="inline-flex items-center gap-1 rounded-md border border-slate-700 bg-slate-800/50 px-2 py-1">
+            Load: <span className="font-semibold text-cyan-400">
+              {cpuModeSettings.cpuMode === "peak" ? "Peak" : "Avg"}
             </span>
           </span>
-          <span className="inline-flex items-center gap-2 rounded-md border border-slate-200 bg-white px-2 py-1">
-            Hosts for capacity: <span className="font-semibold text-slate-700">
-              {formatInt(computed.hostsForCapacity)}
-            </span>
-          </span>
-          <span className="inline-flex items-center gap-2 rounded-md border border-slate-200 bg-white px-2 py-1">
-            Concurrent VMs: <span className="font-semibold text-slate-700">
-              {formatInt(computed.concurrentVms)} ({concurrencyPercent}%)
+          <span className="inline-flex items-center gap-1 rounded-md border border-slate-700 bg-slate-800/50 px-2 py-1">
+            VMs: <span className="font-semibold text-cyan-400">
+              {formatInt(computed.concurrentVms)}
             </span>
           </span>
         </div>
@@ -123,43 +112,37 @@ export function ResourceUtilizationCard({
           <div className="flex items-start justify-between">
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-sm font-semibold text-slate-900">Memory Usage</span>
+                <span className="text-sm font-semibold text-white">Memory</span>
                 <AssessmentBadge status={computed.memAssessment} />
               </div>
-              <div className="mt-1 text-xs text-slate-500">
-                Consumed: {formatNumber(gbToTb(computed.memConsumedGb), 2)} TB ({formatInt(computed.memConsumedGb)} GB)
+              <div className="mt-1 text-xs text-slate-400">
+                {formatNumber(gbToTb(computed.memConsumedGb), 2)} TB consumed
               </div>
             </div>
-            <div className="text-sm font-semibold text-slate-700">
+            <div className="text-lg font-bold text-white">
               {formatNumber(computed.memUtil, 1)}%
             </div>
           </div>
 
           <div className="mt-3">
             <Meter percent={computed.memUtil} />
-            <div className="mt-2 flex items-center justify-between text-[11px] text-slate-400">
-              <span>0 TB</span>
-              <span>
-                {isFailoverView ? "Failover" : "Normal"} Capacity: {formatNumber(gbToTb(computed.memCapacityGb), 2)} TB
-              </span>
+            <div className="mt-1 flex items-center justify-between text-[10px] text-slate-500">
+              <span>0</span>
+              <span>{formatNumber(gbToTb(computed.memCapacityGb), 2)} TB capacity</span>
             </div>
           </div>
 
-          <div className="mt-3 rounded-md bg-slate-50 border border-slate-200 p-3">
-            <div className="text-[11px] uppercase tracking-widest text-slate-500">
-              Memory breakdown (GB)
+          <div className="mt-3 rounded-md bg-slate-800/50 border border-slate-700/50 p-3">
+            <div className="text-[10px] uppercase tracking-widest text-slate-500 mb-2">
+              Breakdown (GB)
             </div>
-            <div className="mt-2 grid grid-cols-2 gap-2 text-sm text-slate-700">
-              <div>VDI VMs ({vmCount} × {formatInt(computed.vdiRamGb / vmCount)} GB)</div>
-              <div className="text-right font-semibold">{formatInt(computed.vdiRamGb)}</div>
-              <div>Infra VMs</div>
-              <div className="text-right font-semibold">{formatInt(infraTotals.infraRamGb)}</div>
-              <div>VM overhead (~100MB/VM)</div>
-              <div className="text-right font-semibold">{formatNumber(computed.vmOverheadGb, 1)}</div>
-              <div>ESXi + agents ({computed.hostsForCapacity} hosts)</div>
-              <div className="text-right font-semibold">{formatInt(computed.systemOverheadGb)}</div>
-              <div>vSAN overhead</div>
-              <div className="text-right font-semibold">{formatInt(computed.vsanOverheadGb)}</div>
+            <div className="grid grid-cols-2 gap-1 text-xs">
+              <div className="text-slate-400">VDI VMs</div>
+              <div className="text-right text-cyan-400">{formatInt(computed.vdiRamGb)}</div>
+              <div className="text-slate-400">Infra VMs</div>
+              <div className="text-right text-cyan-400">{formatInt(infraTotals.infraRamGb)}</div>
+              <div className="text-slate-400">Overhead</div>
+              <div className="text-right text-cyan-400">{formatInt(computed.systemOverheadGb + computed.vsanOverheadGb + computed.vmOverheadGb)}</div>
             </div>
           </div>
         </div>
@@ -171,86 +154,62 @@ export function ResourceUtilizationCard({
           <div className="flex items-start justify-between">
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-sm font-semibold text-slate-900">CPU Usage</span>
+                <span className="text-sm font-semibold text-white">CPU</span>
                 <AssessmentBadge status={computed.cpuAssessment} />
               </div>
-              <div className="mt-1 text-xs text-slate-500">
-                Demand: {formatNumber(computed.totalCpuDemandGhz, 1)} GHz
+              <div className="mt-1 text-xs text-slate-400">
+                {formatNumber(computed.totalCpuDemandGhz, 1)} GHz demand
               </div>
             </div>
-            <div className="text-sm font-semibold text-slate-700">
+            <div className="text-lg font-bold text-white">
               {formatNumber(computed.cpuUtil, 1)}%
             </div>
           </div>
 
           <div className="mt-3">
             <Meter percent={computed.cpuUtil} />
-            <div className="mt-2 flex items-center justify-between text-[11px] text-slate-400">
-              <span>0 GHz</span>
-              <span>
-                {isFailoverView ? "Failover" : "Normal"} Capacity: {formatNumber(computed.cpuCapacityGhz, 1)} GHz
-              </span>
+            <div className="mt-1 flex items-center justify-between text-[10px] text-slate-500">
+              <span>0</span>
+              <span>{formatNumber(computed.cpuCapacityGhz, 0)} GHz capacity</span>
             </div>
           </div>
 
-          <div className="mt-3 rounded-md bg-slate-50 border border-slate-200 p-3">
-            <div className="text-[11px] uppercase tracking-widest text-slate-500">
-              CPU demand breakdown (GHz)
+          <div className="mt-3 rounded-md bg-slate-800/50 border border-slate-700/50 p-3">
+            <div className="text-[10px] uppercase tracking-widest text-slate-500 mb-2">
+              Breakdown (GHz)
             </div>
-            <div className="mt-2 grid grid-cols-2 gap-2 text-sm text-slate-700">
-              <div>VDI workload ({computed.concurrentVms} VMs)</div>
-              <div className="text-right font-semibold">{formatNumber(computed.vdiCpuDemandGhz, 1)}</div>
-              <div>Infra workload</div>
-              <div className="text-right font-semibold">{formatNumber(infraCpuDemandGhz, 1)}</div>
-              <div>vSAN CPU overhead</div>
-              <div className="text-right font-semibold">
-                {vsanMode === "none" ? "0%" : `+${formatInt(vsanCpuOverheadPct)}%`}
-              </div>
-            </div>
-            <div className="mt-2 text-[11px] text-slate-500">
-              Based on LoginVSI {profileSpec?.name} profile: {cpuModeSettings.cpuMode === "peak" ? "peak" : "avg"} demand
+            <div className="grid grid-cols-2 gap-1 text-xs">
+              <div className="text-slate-400">VDI ({computed.concurrentVms} VMs)</div>
+              <div className="text-right text-cyan-400">{formatNumber(computed.vdiCpuDemandGhz, 1)}</div>
+              <div className="text-slate-400">Infra</div>
+              <div className="text-right text-cyan-400">{formatNumber(infraCpuDemandGhz, 1)}</div>
+              {vsanMode !== "none" && (
+                <>
+                  <div className="text-slate-400">vSAN overhead</div>
+                  <div className="text-right text-cyan-400">+{formatInt(vsanCpuOverheadPct)}%</div>
+                </>
+              )}
             </div>
           </div>
         </div>
 
-        <Separator className="my-5" />
+        <Separator className="my-4" />
 
         {/* Bottom Stats */}
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+        <div className="grid grid-cols-3 gap-4 text-center">
           <div>
-            <div className="text-[11px] uppercase tracking-widest text-slate-500">
-              VCPU RATIO
-            </div>
-            <div className="mt-2 text-3xl font-semibold text-slate-900">
-              {formatNumber(computed.vcpuRatio, 1)}<span className="text-slate-400 text-xl">:1</span>
-            </div>
-            <div className="mt-1 text-xs text-slate-400">
-              Target: {profileSpec?.vcpuRatioRecommended}:1 ({profileSpec?.name})
+            <div className="text-[10px] uppercase tracking-widest text-slate-500">vCPU Ratio</div>
+            <div className="mt-1 text-2xl font-bold text-white">
+              {formatNumber(computed.vcpuRatio, 1)}<span className="text-slate-500 text-sm">:1</span>
             </div>
           </div>
-
           <div>
-            <div className="text-[11px] uppercase tracking-widest text-slate-500">
-              VMs PER HOST {isFailoverView && "(failover)"}
-            </div>
-            <div className="mt-2 text-3xl font-semibold text-slate-900">
-              {formatInt(computed.vmsPerHost)}
-            </div>
-            <div className="mt-1 text-xs text-slate-400">
-              Across {computed.hostsForCapacity} {isFailoverView ? "surviving" : "active"} hosts
-            </div>
+            <div className="text-[10px] uppercase tracking-widest text-slate-500">VMs/Host</div>
+            <div className="mt-1 text-2xl font-bold text-white">{formatInt(computed.vmsPerHost)}</div>
           </div>
-
           <div>
-            <div className="text-[11px] uppercase tracking-widest text-slate-500">
-              TOTAL VMs
-            </div>
-            <div className="mt-2 text-3xl font-semibold text-slate-900">
-              {formatInt(vmCount)}
-            </div>
-            <div className="mt-1 text-xs text-slate-400">
-              + {formatInt(infraTotals.infraVmCount)} Infra VMs
-            </div>
+            <div className="text-[10px] uppercase tracking-widest text-slate-500">Total VMs</div>
+            <div className="mt-1 text-2xl font-bold text-white">{formatInt(vmCount)}</div>
           </div>
         </div>
       </CardContent>

@@ -14,15 +14,15 @@ export function TopTilesSection({ hardware, computed }: TopTilesSectionProps) {
   const hasWarning = computed.memAssessment === "WARNING" || computed.cpuAssessment === "WARNING"
 
   return (
-    <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-4">
+    <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
       <TopTile
         title="CLUSTER HOSTS"
-        tone="blue"
+        tone="cyan"
         icon={<Server className="h-8 w-8" />}
         value={formatInt(hardware.hosts)}
         sub={
           <span className="inline-flex items-center gap-2">
-            <Shield className="h-3 w-3 text-amber-500" />
+            <Shield className="h-3 w-3 text-amber-400" />
             N+{hardware.nPlusRedundancy} protected
           </span>
         }
@@ -30,7 +30,7 @@ export function TopTilesSection({ hardware, computed }: TopTilesSectionProps) {
 
       <TopTile
         title="MEMORY CAPACITY"
-        tone="blue"
+        tone="cyan"
         icon={<Database className="h-8 w-8" />}
         value={`${formatNumber(computed.clusterMemRawTb, 2)} TB`}
         sub={
@@ -42,7 +42,7 @@ export function TopTilesSection({ hardware, computed }: TopTilesSectionProps) {
 
       <TopTile
         title="CPU CAPACITY"
-        tone="blue"
+        tone="cyan"
         icon={<Cpu className="h-8 w-8" />}
         value={`${formatNumber(computed.clusterCpuRawThz, 2)} THz`}
         sub={
@@ -54,10 +54,10 @@ export function TopTilesSection({ hardware, computed }: TopTilesSectionProps) {
 
       <TopTile
         title={isFailoverView ? "FAILOVER STATUS" : "SIZING STATUS"}
-        tone={isCompliant ? "green" : "blue"}
-        icon={<CheckCircle2 className={`h-8 w-8 ${isCompliant ? "text-emerald-500" : hasWarning ? "text-amber-500" : "text-red-500"}`} />}
+        tone={isCompliant ? "green" : "cyan"}
+        icon={<CheckCircle2 className={`h-8 w-8 ${isCompliant ? "text-emerald-400" : hasWarning ? "text-amber-400" : "text-red-400"}`} />}
         value={
-          <span className={isCompliant ? "text-emerald-600" : hasWarning ? "text-amber-600" : "text-red-600"}>
+          <span className={isCompliant ? "text-emerald-400" : hasWarning ? "text-amber-400" : "text-red-400"}>
             {computed.cpuAssessment === "CRITICAL" || computed.memAssessment === "CRITICAL" 
               ? "Over Capacity" 
               : hasWarning 
@@ -66,7 +66,7 @@ export function TopTilesSection({ hardware, computed }: TopTilesSectionProps) {
           </span>
         }
         sub={
-          <span className="text-slate-500">
+          <span className="text-slate-400">
             CPU: {formatNumber(computed.cpuUtil, 0)}% • Mem: {formatNumber(computed.memUtil, 0)}%
           </span>
         }

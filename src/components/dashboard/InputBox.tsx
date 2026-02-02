@@ -19,11 +19,11 @@ export function InputBox({
 }: InputBoxProps) {
   return (
     <div>
-      <div className="text-[11px] uppercase tracking-widest text-slate-500">
+      <div className="text-[10px] uppercase tracking-widest text-slate-400">
         {label}
       </div>
       <input
-        className="mt-2 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-200 disabled:opacity-50 disabled:bg-slate-50"
+        className="mt-1 w-full rounded-md border border-slate-700 bg-slate-800/50 px-3 py-2 text-sm text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500 disabled:opacity-50 disabled:bg-slate-800"
         type="number"
         step={step}
         value={value}

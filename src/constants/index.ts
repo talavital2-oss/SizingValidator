@@ -105,12 +105,12 @@ export const DEFAULT_SYSTEM_OVERHEAD: SystemOverhead = {
 export const DEFAULT_INFRA_VMS: InfraVm[] = [
   {
     key: "vcsa",
-    label: "vCenter Server Appliance (Tiny)",
+    label: "vCenter Server Appliance",
     enabled: true,
     count: 1,
-    vcpu: 2,
-    ramGb: 14,
-    note: "Tiny (up to ~10 hosts / 100 VMs)",
+    vcpu: 8,
+    ramGb: 16,
+    note: "Small deployment size",
   },
   {
     key: "cs",
@@ -118,16 +118,16 @@ export const DEFAULT_INFRA_VMS: InfraVm[] = [
     enabled: true,
     count: 2,
     vcpu: 4,
-    ramGb: 10,
-    note: "2 for redundancy (10GB standard, 16GB large)",
+    ramGb: 8,
+    note: "2 for redundancy",
   },
   {
     key: "uag",
-    label: "Unified Access Gateway (Standard)",
+    label: "Unified Access Gateway",
     enabled: true,
     count: 2,
-    vcpu: 2,
-    ramGb: 4,
+    vcpu: 4,
+    ramGb: 8,
     note: "2 for redundancy",
   },
   {
@@ -145,7 +145,7 @@ export const DEFAULT_INFRA_VMS: InfraVm[] = [
     enabled: false,
     count: 1,
     vcpu: 4,
-    ramGb: 4,
+    ramGb: 8,
     note: "Per Omnissa sizing docs",
   },
   {
@@ -158,6 +158,16 @@ export const DEFAULT_INFRA_VMS: InfraVm[] = [
     note: "4GB minimum per Omnissa docs",
   },
 ]
+
+/**
+ * Default DEM (Dynamic Environment Manager) storage settings
+ */
+export const DEFAULT_DEM_STORAGE = {
+  profilesEnabled: true,
+  profileSizeGbPerUser: 0.5,  // 500 MB per user for DEM profiles
+  userDataEnabled: true,
+  userDataSizeGbPerUser: 2,   // 2 GB per user for user data/folders
+}
 
 /**
  * vSAN memory overhead per host by mode
